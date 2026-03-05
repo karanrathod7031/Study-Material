@@ -19,7 +19,10 @@ app.use(helmet({
 
 // 2. CORS (Sabse upar hona chahiye routes se pehle) ✅
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173","https://study-material-7e5r0x0ks-karanrathod7031s-projects.vercel.app/",
+    origin: [
+    'https://study-material-7e5r0x0ks-karanrathod7031s-projects.vercel.app', // Your specific Vercel URL
+    'http://localhost:5173' 
+  ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
