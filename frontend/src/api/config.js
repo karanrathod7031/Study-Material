@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Ek central instance banao
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  baseURL: import.meta.env.VITE_API_URL || 'https://study-material-19vf.onrender.com',
 });
 
 // Request interceptor: Token automatically har request mein chala jayega
