@@ -20,8 +20,8 @@ app.use(helmet({
 // 2. CORS (Sabse upar hona chahiye routes se pehle) ✅
 app.use(cors({
     origin: [
-    'https://study-material-7e5r0x0ks-karanrathod7031s-projects.vercel.app', // Your specific Vercel URL
-    'http://localhost:5173' 
+   origin: 'https://your-lifestyle-store.vercel.app', // Your Vercel URL
+  credentials: true 
   ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -59,13 +59,5 @@ mongoose.connect(process.env.MONGO_URI)
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // --- 🚀 SERVER START ---
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`
-    ======================================
-    🔥 Server running on port: ${PORT}
-    📡 API URL: http://localhost:${PORT}/api
-    🚀 Ready for Production!
-    ======================================
-    `);
-});
+const PORT = process.env.PORT || 10000; 
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
