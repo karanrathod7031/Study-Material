@@ -20,7 +20,7 @@ const allowedOrigins = [
     'https://study-material-iota.vercel.app', 
     'http://localhost:5173', 
     'http://localhost:3000', 
-    /\.vercel\.app$/
+    /\.vercel\.app$/ // Allows all Vercel preview deployments
 ];
 
 app.use(cors({
@@ -30,13 +30,11 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.options('*', cors()); // Pre-flight handler
-
-// 3. Body Parsers
+// --- 📝 BODY PARSERS ---
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// 4. Rate Limiter
+// --- 🚀 RATE LIMITER ---
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
     max: 200 
@@ -57,7 +55,7 @@ app.get('/', (req, res) => {
 
 // --- 🔌 DATABASE CONNECTION ---
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected: Cloud Database Ready'))
+    .then(() => console.log('✅ MongoDB Connected'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // --- 🚀 SERVER START ---
