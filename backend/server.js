@@ -52,7 +52,7 @@ app.use('/api/assets', require('./routes/assetRoutes'));
 
 // --- 🏠 BASE ROUTE ---
 app.get('/', (req, res) => {
-    res.send('EduDrive API for Lifestyle Fashion Store is running smoothly... 🚀');
+    res.send('EduDrive API is running smoothly... 🚀');
 });
 
 // --- 🔌 DATABASE CONNECTION ---
