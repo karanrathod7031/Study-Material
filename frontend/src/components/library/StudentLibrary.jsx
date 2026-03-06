@@ -16,14 +16,14 @@ const StudentLibrary = ({ activeTag = 'All' }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
-  // --- 🔄 FIX 1: Safe Data Extraction ---
+  // --- 🔄 FIX 1: Safe Data Extraction to prevent M.map error ---
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
         const response = await assetService.fetchAssets(currentFolder);
         
-        // Handle if response is the array OR an object containing the array
+        // Ensure data is always an array, even if nested in an object
         const dataArray = Array.isArray(response) 
           ? response 
           : (response?.assets || response?.data || []);
@@ -40,13 +40,9 @@ const StudentLibrary = ({ activeTag = 'All' }) => {
     load();
   }, [currentFolder]);
 
-  // --- 🔍 FIX 2: Safe Filtering ---
+  // --- 🔍 FIX 2: Safe Filtering with Array Guard ---
   useEffect(() => {
-    // Ensure assets is an array before calling .filter
-    if (!Array.isArray(assets)) {
-        setFilteredAssets([]);
-        return;
-    }
+    if (!Array.isArray(assets)) return; // Don't filter if not an array
 
     let temp = [...assets];
 
@@ -71,11 +67,13 @@ const StudentLibrary = ({ activeTag = 'All' }) => {
       if (asset.price > 0) {
         toast.success("Checkout system coming soon!", { icon: '💳' });
       } else {
-        // Safe URL handling
+        // Safe URL cleaning for Lifestyle fashion store assets
         let cleanUrl = (asset.fileUrl || "").replace("http://", "https://");
+        
         if (cleanUrl.includes("upload/")) {
             cleanUrl = cleanUrl.replace("/upload/f_auto,q_auto/", "/upload/");
         }
+
         setSelectedFile({ ...asset, fileUrl: cleanUrl });
         setIsPreviewOpen(true);
       }
@@ -101,7 +99,7 @@ const StudentLibrary = ({ activeTag = 'All' }) => {
           {currentFolder && (
             <button 
               onClick={() => setCurrentFolder(null)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all uppercase tracking-widest"
+              className="px-6 py-2 bg-blue-600 text-white rounded-xl text-[10px] font-black hover:bg-blue-700 transition-all uppercase tracking-widest"
             >
               ← BACK TO MAIN
             </button>
