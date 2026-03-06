@@ -1,4 +1,4 @@
-// 1. Sabse pehle environment variables load karein
+// 1. Environment variables load karein
 require('dotenv').config(); 
 
 const express = require('express');
@@ -6,23 +6,23 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();     
 
 // --- 🛡️ SECURITY & BASE MIDDLEWARES ---
 
-// 1. Helmet (Security headers) - Content Security Policy ko thoda relax kiya file uploads ke liye
+// 1. Helmet (Security headers)
 app.use(helmet({
     contentSecurityPolicy: false, 
 }));
 
-// 2. CORS (Sabse upar hona chahiye routes se pehle) ✅
+// 2. CORS (Fixed Syntax ✅)
 app.use(cors({
     origin: [
-   origin: 'https://your-lifestyle-store.vercel.app', // Your Vercel URL
-  credentials: true 
-  ],
+        'https://study-material-iota.vercel.app', // Your Vercel URL from the screenshot
+        'http://localhost:5173',                  // For local Vite development
+        'http://localhost:3000'                   // For local React development
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -32,25 +32,24 @@ app.use(cors({
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true }));
 
-// 4. Rate Limiter (Sirf production ke liye ya relaxed development ke liye)
+// 4. Rate Limiter
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, 
-    max: 200 // Development mein isey thoda badha diya taaki bar-bar block na ho
+    max: 200 
 });
 app.use('/api/', limiter);
 
 // --- 🛣️ ROUTE DEFINITIONS ---
 
-// Routes ko yahan import aur use karein (CORS ke niche)
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/drive', require('./routes/driveRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/assets', require('./routes/assetRoutes')); // ✅ Yeh ab sahi kaam karega
+app.use('/api/assets', require('./routes/assetRoutes')); 
 
 // --- 🏠 BASE ROUTE ---
 app.get('/', (req, res) => {
-    res.send('EduDrive API is running smoothly... 🚀');
+    res.send('EduDrive API for Lifestyle Fashion Store is running smoothly... 🚀');
 });
 
 // --- 🔌 DATABASE CONNECTION ---
