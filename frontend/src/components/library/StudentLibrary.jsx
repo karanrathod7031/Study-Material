@@ -6,7 +6,7 @@ import SearchBar from './SearchBar';
 import FilePreview from './FilePreview'; 
 import { toast } from 'react-hot-toast';
 
-const StudentLibrary = ({ activeTag }) => {
+const StudentLibrary = ({ activeTag = 'All' }) => {
   const [assets, setAssets] = useState([]);
   const [filteredAssets, setFilteredAssets] = useState([]);
   const [currentFolder, setCurrentFolder] = useState(null);
@@ -16,33 +16,54 @@ const StudentLibrary = ({ activeTag }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
+  // --- 🔄 FIX 1: Safe Data Extraction ---
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const data = await assetService.fetchAssets(currentFolder);
-        setAssets(data);
-        setFilteredAssets(data);
-      } catch (err) { toast.error("Error loading library"); }
+        const response = await assetService.fetchAssets(currentFolder);
+        
+        // Handle if response is the array OR an object containing the array
+        const dataArray = Array.isArray(response) 
+          ? response 
+          : (response?.assets || response?.data || []);
+        
+        setAssets(dataArray);
+        setFilteredAssets(dataArray);
+      } catch (err) { 
+        console.error("Fetch error:", err);
+        toast.error("Error loading library"); 
+        setAssets([]); // Reset to empty array on error
+      }
       setLoading(false);
     };
     load();
   }, [currentFolder]);
 
+  // --- 🔍 FIX 2: Safe Filtering ---
   useEffect(() => {
-    let temp = assets;
+    // Ensure assets is an array before calling .filter
+    if (!Array.isArray(assets)) {
+        setFilteredAssets([]);
+        return;
+    }
+
+    let temp = [...assets];
+
     if (activeTag !== 'All') {
       temp = temp.filter(a => a.category === activeTag);
     }
+
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       temp = temp.filter(a => 
-        a.title.toLowerCase().includes(searchTerm.toLowerCase())
+        (a.title || "").toLowerCase().includes(term)
       );
     }
+    
     setFilteredAssets(temp);
   }, [searchTerm, activeTag, assets]);
 
-  // --- 🛠️ UPDATED: Action Handler with 401 Fix Logic ---
   const handleAction = (asset) => {
     if (asset.type === 'folder') {
       setCurrentFolder(asset._id);
@@ -50,16 +71,11 @@ const StudentLibrary = ({ activeTag }) => {
       if (asset.price > 0) {
         toast.success("Checkout system coming soon!", { icon: '💳' });
       } else {
-        // 🛡️ 401/CORS Fix: URL ko sanitize aur HTTPS ensure karna
-        let cleanUrl = asset.fileUrl.replace("http://", "https://");
-        
-        // Agar Cloudinary URL mein transformations hain, toh unhe clean karna
-        // (Yeh line zaroori hai agar Viewer file fetch nahi kar pa raha)
+        // Safe URL handling
+        let cleanUrl = (asset.fileUrl || "").replace("http://", "https://");
         if (cleanUrl.includes("upload/")) {
-            // PDF ko bypass karne ke liye optimization hatana pad sakta hai
             cleanUrl = cleanUrl.replace("/upload/f_auto,q_auto/", "/upload/");
         }
-
         setSelectedFile({ ...asset, fileUrl: cleanUrl });
         setIsPreviewOpen(true);
       }
@@ -95,12 +111,13 @@ const StudentLibrary = ({ activeTag }) => {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           {loading ? (
             [...Array(10)].map((_, i) => <AssetSkeleton key={i} />)
-          ) : filteredAssets.length > 0 ? (
+          // --- 🛡️ FIX 3: Safe Mapping Guard ---
+          ) : (Array.isArray(filteredAssets) && filteredAssets.length > 0) ? (
             filteredAssets.map(asset => (
               <AssetCard 
                 key={asset._id} 
                 asset={asset} 
-                onOpen={(a) => handleAction(a)}
+                onOpen={handleAction}
                 onAction={handleAction} 
               />
             ))
