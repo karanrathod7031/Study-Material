@@ -11,17 +11,16 @@ const app = express();
 
 // --- 🛡️ SECURITY & BASE MIDDLEWARES ---
 
-// 1. Helmet (Security headers)
 app.use(helmet({
     contentSecurityPolicy: false, 
 }));
 
-// 2. CORS (Fixed & Optimized for Vercel ✅)
+// 2. CORS (Fixed & Verified Syntax ✅)
 const allowedOrigins = [
-    'https://study-material-iota.vercel.app',            // Main Vercel URL
-    'http://localhost:5173',                             // Local Vite
-    'http://localhost:3000',                             // Local React
-    /\.vercel\.app$/                                     // ALLOWS ALL VERCEL PREVIEW LINKS
+    'https://study-material-iota.vercel.app', 
+    'http://localhost:5173', 
+    'http://localhost:3000', 
+    /\.vercel\.app$/
 ];
 
 app.use(cors({
@@ -31,8 +30,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Handle "Pre-flight" requests (Crucial for fixing ERR_FAILED)
-app.options('*', cors());
+app.options('*', cors()); // Pre-flight handler
 
 // 3. Body Parsers
 app.use(express.json()); 
@@ -46,7 +44,6 @@ const limiter = rateLimit({
 app.use('/api/', limiter);
 
 // --- 🛣️ ROUTE DEFINITIONS ---
-
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/drive', require('./routes/driveRoutes'));
 app.use('/api/payments', require('./routes/paymentRoutes'));
@@ -59,7 +56,6 @@ app.get('/', (req, res) => {
 });
 
 // --- 🔌 DATABASE CONNECTION ---
-// Make sure MONGO_URI is set in Render Dashboard -> Environment
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('✅ MongoDB Connected: Cloud Database Ready'))
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
