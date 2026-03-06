@@ -8,7 +8,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const adminRoutes = require('./routes/adminRoutes');
 
-const app = express(); 
+const app = express();     
 
 // --- 🛡️ SECURITY & BASE MIDDLEWARES ---
 
