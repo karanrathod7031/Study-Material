@@ -1,16 +1,14 @@
 import axios from 'axios';
 
-// Ek central instance banao
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://study-material-19vf.onrender.com',
+  // FIX: Added /api to the end of the Render URL
+  baseURL: import.meta.env.VITE_API_URL || 'https://study-material-19vf.onrender.com/api',
+  withCredentials: true 
 });
 
-// Request interceptor: Token automatically har request mein chala jayega
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) req.headers.Authorization = `Bearer ${token}`;
   return req;
 });
 
